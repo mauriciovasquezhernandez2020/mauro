@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Plan de Cocina</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap" rel="stylesheet">
+<style>
+@page { size: letter; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Poppins', 'Noto Color Emoji', sans-serif; color: #1f2430; background: #e9e9ee; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 8.5in; height: 11in; padding: .38in .42in .32in; position: relative; overflow: hidden; background: #fffdf8; page-break-after: always; display: flex; flex-direction: column; gap: 10px; }
+.page:last-child { page-break-after: auto; }
+.blob { position: absolute; border-radius: 50%; filter: blur(2px); opacity: .18; z-index: 0; }
+.page > *:not(.blob) { position: relative; z-index: 1; }
+.emo { font-family: 'Noto Color Emoji', sans-serif; }
+
+/* header */
+.hero { border-radius: 22px; padding: 16px 20px; color: #fff; display: flex; align-items: center; gap: 16px; box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+.hero .big { font-size: 64px; line-height: 1; filter: drop-shadow(0 6px 8px rgba(0,0,0,.25)); }
+.hero h1 { font-family: 'Fraunces', serif; font-weight: 900; font-size: 38px; line-height: 1; letter-spacing: -.5px; }
+.hero .sub { font-size: 12px; opacity: .95; margin-top: 4px; }
+.chips { margin-left: auto; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.chip { background: rgba(255,255,255,.95); color: #1f2430; border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.chip b { font-size: 15px; }
+
+/* formula */
+.formula { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: #fff; border-radius: 16px; padding: 9px 12px; border: 2px dashed var(--c); }
+.formula .t { font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--c); margin-right: 4px; }
+.pill { background: var(--soft); border-radius: 12px; padding: 5px 10px; font-size: 12px; font-weight: 600; }
+.pill .n { font-weight: 800; color: var(--c); font-size: 14px; }
+.plus { font-weight: 800; color: var(--c); }
+
+.cols { display: grid; grid-template-columns: 1fr 1.25fr; gap: 12px; flex: 1; min-height: 0; }
+.box { background: #fff; border-radius: 16px; padding: 10px 12px; box-shadow: 0 3px 10px rgba(0,0,0,.06); }
+.box h2 { font-size: 13px; font-weight: 800; color: var(--c); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; display: flex; gap: 6px; align-items: center; }
+.grp { margin-bottom: 7px; }
+.grp h3 { font-size: 11.5px; font-weight: 700; background: var(--soft); display: inline-block; padding: 2px 9px; border-radius: 8px; margin-bottom: 3px; }
+.grp ul { list-style: none; font-size: 10.4px; line-height: 1.38; columns: 2; column-gap: 10px; }
+.grp ul.one { columns: 1; }
+.grp li::before { content: "• "; color: var(--c); font-weight: 800; }
+.grp li b { font-weight: 600; }
+
+.menus { display: flex; flex-direction: column; gap: 7px; }
+.menu { border-radius: 14px; padding: 8px 10px 8px 12px; background: linear-gradient(135deg, var(--soft), #fff 70%); border-left: 5px solid var(--c); display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: center; }
+.menu .ic { font-size: 28px; line-height: 1; }
+.menu h4 { font-size: 12.3px; font-weight: 700; line-height: 1.2; }
+.menu p { font-size: 10.2px; line-height: 1.35; color: #3b4150; }
+.kc { text-align: right; font-size: 10px; font-weight: 600; color: #555; white-space: nowrap; }
+.kc b { display: block; font-size: 15px; color: var(--c); font-weight: 800; }
+.menu.new { border-left-color: #111; background: linear-gradient(135deg, #fff3c4, #fff 75%); }
+.tag { display: inline-block; font-size: 8.5px; font-weight: 800; background: #111; color: #ffd84d; padding: 1px 6px; border-radius: 6px; margin-right: 4px; vertical-align: 1px; letter-spacing: .4px; }
+
+.tips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tip { background: var(--c); color: #fff; border-radius: 14px; padding: 8px 10px; font-size: 10.2px; line-height: 1.35; display: flex; gap: 7px; align-items: flex-start; }
+.tip .emo { font-size: 18px; line-height: 1; }
+.foot { display: flex; justify-content: space-between; align-items: center; font-size: 9.5px; color: #666; border-top: 1px solid #e5e2da; padding-top: 6px; }
+.foot .day { background: #1f2430; color: #fff; border-radius: 999px; padding: 4px 12px; font-weight: 600; font-size: 10px; }
+
+/* themes */
+.desayuno { --c: #e07a00; --soft: #ffe9c7; }
+.desayuno .hero { background: linear-gradient(120deg, #f7971e, #ffb347 55%, #ffd200); }
+.mm { --c: #2e9b4f; --soft: #dcf5df; }
+.mm .hero { background: linear-gradient(120deg, #11998e, #38ef7d); }
+.almuerzo { --c: #d9432f; --soft: #ffe0d8; }
+.almuerzo .hero { background: linear-gradient(120deg, #e53935, #ff7043 60%, #ffa726); }
+.mt { --c: #c2185b; --soft: #fde0ec; }
+.mt .hero { background: linear-gradient(120deg, #c2185b, #f06292 60%, #ff8a80); }
+.cena { --c: #3f3dbb; --soft: #e3e3fb; }
+.cena .hero { background: linear-gradient(120deg, #1a237e, #3f51b5 55%, #7e57c2); }
+.nevera { --c: #00838f; --soft: #d7f3f5; }
+.nevera .hero { background: linear-gradient(120deg, #006064, #00acc1 60%, #26c6da); }
+
+/* nevera */
+.rules { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; flex: 1; }
+.rule { background: #fff; border-radius: 16px; padding: 10px 12px; display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; box-shadow: 0 3px 10px rgba(0,0,0,.06); border-top: 4px solid var(--rc, #00838f); }
+.rule .emo { font-size: 32px; text-align: center; }
+.rule h4 { font-size: 13px; font-weight: 800; line-height: 1.15; margin-bottom: 2px; }
+.rule p { font-size: 10.3px; line-height: 1.35; color: #3b4150; }
+.plate { display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 18px; padding: 10px 14px; box-shadow: 0 3px 10px rgba(0,0,0,.06); }
+.alarm { background: #b71c1c; color: #fff; border-radius: 16px; padding: 9px 14px; font-size: 10.8px; line-height: 1.4; display: flex; gap: 10px; align-items: center; }
+.alarm .emo { font-size: 26px; }
+.meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.meta div { background: #1f2430; color: #fff; border-radius: 14px; padding: 8px; text-align: center; font-size: 10px; }
+.meta b { display: block; font-size: 18px; color: #7ff0ff; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<!-- ============ DESAYUNO ============ -->
+<section class="page desayuno">
+  <div class="blob" style="width:340px;height:340px;background:#ffb347;right:-120px;top:260px"></div>
+  <div class="blob" style="width:260px;height:260px;background:#ffd200;left:-100px;bottom:-60px"></div>
+  <div class="hero">
+    <div class="big emo">🍳</div>
+    <div><h1>Desayuno</h1><div class="sub">Arranca con proteína: es lo que más te sostiene hasta las 10.</div></div>
+    <div class="chips"><span class="chip">⏰ <b>6:30 a.m.</b></span><span class="chip">🔥 Meta <b>≈ 350 kcal</b></span><span class="chip">💪 Proteína <b>≥ 22 g</b></span></div>
+  </div>
+  <div class="formula"><span class="t">Tu fórmula</span>
+    <span class="pill"><span class="n">3</span> Proteínas</span><span class="plus">+</span>
+    <span class="pill"><span class="n">1</span> Harina</span><span class="plus">+</span>
+    <span class="pill"><span class="n">1</span> Bebida sin azúcar</span><span class="plus">+</span>
+    <span class="pill"><span class="n">½</span> Leche descremada (opcional)</span>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h2><span class="emo">🥚</span>Elige tus porciones</h2>
+      <div class="grp"><h3>🥚 Proteína · 1 porción ≈ 75 kcal · 7 g</h3><ul>
+        <li><b>Huevo</b> 1 unidad</li><li><b>Huevo codorniz</b> 5</li><li><b>Quesito/cuajada</b> 1 tajada 1 cm (32 g)</li><li><b>Jamón pietrán</b> 2 tajadas</li><li><b>Mozzarella light</b> 2 lonchitas</li><li><b>Queso pera</b> 1 pequeño</li><li><b>Snack de queso</b> 1</li><li><b>Queso costeño rallado</b> 2 cdas</li></ul></div>
+      <div class="grp"><h3>🫓 Harina · 1 porción ≈ 80 kcal</h3><ul>
+        <li><b>Arepa delgada</b> 1 (media tela)</li><li><b>Pan integral</b> 1 tajada</li><li><b>Avena en hojuelas</b> 3 cdas</li><li><b>Tostadas arroz</b> 3</li><li><b>Galletas integrales</b> 3</li><li><b>Tortilla integral</b> 1</li><li><b>Papa criolla</b> 3 medianas</li><li><b>Yuca</b> 1 trozo</li><li><b>Plátano maduro</b> ¼</li><li><b>Arroz integral</b> 4 cdas</li></ul></div>
+      <div class="grp"><h3>☕ Bebida · 0–25 kcal</h3><ul>
+        <li>Café negro o con ½ pocillo de leche descremada</li><li>Aromática de bolsita</li><li>Chocolyne en agua</li><li>Endulzar solo con <b>stevia líquida</b></li></ul></div>
+      <div class="grp"><h3>🚫 No va en el desayuno</h3><ul class="one">
+        <li>Chocolate con azúcar, pan blanco de panadería, buñuelo, pandequeso, jugo</li><li>Mantequilla, margarina o queso crema</li></ul></div>
+    </div>
+    <div class="box">
+      <h2><span class="emo">📋</span>Menús listos para preparar</h2>
+      <div class="menus">
+        <div class="menu"><div class="ic emo">🫓</div><div><h4>Calentado paisa light</h4><p>2 huevos pericos (tomate y cebolla, sin aceite) + 1 tajada de quesito + 1 arepa delgada + café.</p></div><div class="kc"><b>310</b>kcal · 20 g</div></div>
+        <div class="menu"><div class="ic emo">🧀</div><div><h4>Arepa rellena</h4><p>Arepa media tela + 2 tajadas de jamón pietrán + 2 lonchitas de mozzarella light + 1 huevo cocido en rodajas.</p></div><div class="kc"><b>305</b>kcal · 21 g</div></div>
+        <div class="menu"><div class="ic emo">🍄</div><div><h4>Omelette de champiñones y espinaca</h4><p>2 huevos + 2 lonchitas de mozzarella + champiñones y espinaca libres + 1 tajada de pan integral.</p></div><div class="kc"><b>330</b>kcal · 21 g</div></div>
+        <div class="menu"><div class="ic emo">🥣</div><div><h4>Coladita de avena + huevos</h4><p>3 cdas de avena en ½ pocillo de leche descremada + agua, canela y stevia + 2 huevos cocidos.</p></div><div class="kc"><b>320</b>kcal · 20 g</div></div>
+        <div class="menu"><div class="ic emo">🍘</div><div><h4>Tostadas con codorniz</h4><p>3 tostadas de arroz + 5 huevos de codorniz + 1 quesito + rodajas de tomate con orégano.</p></div><div class="kc"><b>300</b>kcal · 20 g</div></div>
+        <div class="menu new"><div class="ic emo">🍅</div><div><h4><span class="tag">ALGO DIFERENTE</span>Shakshuka criolla</h4><p>2 huevos cocidos dentro de un hogao natural (tomate, cebolla, pimentón, comino) + 1 tajada de cuajada encima + 1 arepa delgada para untar.</p></div><div class="kc"><b>320</b>kcal · 20 g</div></div>
+        <div class="menu new"><div class="ic emo">🌯</div><div><h4><span class="tag">ALGO DIFERENTE</span>Wrap mañanero</h4><p>1 tortilla integral + 2 huevos revueltos con espinaca + 2 cdas de queso costeño rallado + pico de gallo.</p></div><div class="kc"><b>310</b>kcal · 19 g</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="tips">
+    <div class="tip"><span class="emo">🥇</span><span><b>Primero el huevo y el queso</b>, después la arepa. Si te llenas, lo que sobra es la harina.</span></div>
+    <div class="tip"><span class="emo">⏳</span><span><b>El café va 30 min después</b> de comer, no con la comida (por la manga).</span></div>
+    <div class="tip"><span class="emo">🥛</span><span><b>Leche: máximo 1 pocillo al día</b>, descremada o semidescremada.</span></div>
+  </div>
+  <div class="foot"><span>Integración de los planes CEMDE (13-11-2026) y Modo Fisio (19-11-2026). Las kcal son aproximadas.</span><span class="day">Meta del día: ≈ 1.300 kcal · ≥ 100 g proteína · 6–8 vasos de agua</span></div>
+</section>
+
+<!-- ============ MEDIA MAÑANA ============ -->
+<section class="page mm">
+  <div class="blob" style="width:360px;height:360px;background:#38ef7d;right:-140px;top:300px"></div>
+  <div class="blob" style="width:240px;height:240px;background:#11998e;left:-90px;bottom:-40px"></div>
+  <div class="hero">
+    <div class="big emo">🍊</div>
+    <div><h1>Media mañana</h1><div class="sub">La fruta sola se va rápido. Con proteína aguantas hasta el almuerzo.</div></div>
+    <div class="chips"><span class="chip">⏰ <b>10:00 a.m.</b></span><span class="chip">🔥 Meta <b>≈ 135 kcal</b></span><span class="chip">💪 Proteína <b>≥ 7 g</b></span></div>
+  </div>
+  <div class="formula"><span class="t">Tu fórmula</span>
+    <span class="pill"><span class="n">1</span> Fruta entera (no jugo)</span><span class="plus">+</span>
+    <span class="pill"><span class="n">1</span> Proteína</span>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h2><span class="emo">🍓</span>Elige tus porciones</h2>
+      <div class="grp"><h3>🍎 Fruta · 1 porción ≈ 60 kcal</h3><ul>
+        <li><b>Mandarina/naranja</b> 1 pequeña</li><li><b>Manzana</b> 1 pequeña</li><li><b>Pera</b> ½ mediana</li><li><b>Mango</b> 1 pequeño</li><li><b>Guayaba</b> 1 mediana</li><li><b>Granadilla</b> 1 grande</li><li><b>Maracuyá</b> 1 grande</li><li><b>Fresas</b> 9 medianas</li><li><b>Uvas/moras</b> 12</li><li><b>Uchuvas</b> 17</li><li><b>Papaya/piña/melón</b> 1 tajada delgada</li><li><b>Sandía</b> ¼ pequeña</li><li><b>Banano</b> ½ pequeño</li><li><b>Kiwi</b> 1 mediano</li><li><b>Pitaya</b> 1 mediana</li><li><b>Tomate de árbol</b> 2 pequeños</li><li><b>Mamoncillo</b> 10</li><li><b>Pomarrosa</b> 2 pequeñas</li><li><b>Ciruela claudia</b> 2</li><li><b>Murrapo</b> 1</li></ul></div>
+      <div class="grp"><h3>🧀 Proteína · ≈ 75 kcal · 7 g</h3><ul>
+        <li><b>Quesito/cuajada</b> 1 tajada</li><li><b>Huevo cocido</b> 1</li><li><b>Huevo codorniz</b> 5</li><li><b>Snack de queso</b> 1</li><li><b>Mozzarella light</b> 2 lonchitas</li><li><b>Jamón pietrán</b> 2 tajadas</li><li><b>Queso pera</b> 1 pequeño</li></ul></div>
+      <div class="grp"><h3>🚫 Evita</h3><ul class="one">
+        <li>Jugos, salpicón o fruta muy madura: se absorben como azúcar</li><li>Fruta con leche condensada, miel o crema</li></ul></div>
+    </div>
+    <div class="box">
+      <h2><span class="emo">📋</span>Combinaciones listas</h2>
+      <div class="menus">
+        <div class="menu"><div class="ic emo">🍊</div><div><h4>Mandarina + quesito</h4><p>1 mandarina + 1 tajada de quesito campesino. Perfecta para llevar a cualquier parte.</p></div><div class="kc"><b>135</b>kcal · 7 g</div></div>
+        <div class="menu"><div class="ic emo">🍏</div><div><h4>Manzana + mozzarella</h4><p>1 manzana pequeña en tajadas + 2 lonchitas de mozzarella light enrolladas.</p></div><div class="kc"><b>135</b>kcal · 7 g</div></div>
+        <div class="menu"><div class="ic emo">🥚</div><div><h4>Papaya + huevo duro</h4><p>1 tajada delgada de papaya con limón + 1 huevo cocido con sal y pimienta.</p></div><div class="kc"><b>135</b>kcal · 7 g</div></div>
+        <div class="menu"><div class="ic emo">🍇</div><div><h4>Uvas + snack de queso</h4><p>12 uvas + 1 snack de queso. La opción de la lonchera de oficina.</p></div><div class="kc"><b>135</b>kcal · 7 g</div></div>
+        <div class="menu"><div class="ic emo">🍐</div><div><h4>Guayaba + codorniz</h4><p>1 guayaba mediana + 5 huevos de codorniz.</p></div><div class="kc"><b>135</b>kcal · 7 g</div></div>
+        <div class="menu new"><div class="ic emo">🥭</div><div><h4><span class="tag">ALGO DIFERENTE</span>Mango biche callejero</h4><p>1 mango pequeño biche en tiras con limón y una pizca de sal + 1 tajada de quesito. Sabor de calle, porción de plan.</p></div><div class="kc"><b>135</b>kcal · 7 g</div></div>
+        <div class="menu new"><div class="ic emo">🥒</div><div><h4><span class="tag">ALGO DIFERENTE</span>Bastones crocantes</h4><p>Pepino y zanahoria en bastones (libres) + 1 granadilla + 1 queso pera. Para cuando el hambre aprieta.</p></div><div class="kc"><b>150</b>kcal · 7 g</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="tips">
+    <div class="tip"><span class="emo">💧</span><span><b>Este es buen momento para el agua:</b> 2 vasos en sorbos entre el desayuno y esta comida.</span></div>
+    <div class="tip"><span class="emo">🎒</span><span><b>Déjala lista la noche anterior</b>: en un recipiente pequeño, contada.</span></div>
+    <div class="tip"><span class="emo">🍌</span><span><b>El banano y el mango cuentan doble</b> si son grandes. Respeta el tamaño.</span></div>
+  </div>
+  <div class="foot"><span>Integración de los planes CEMDE (13-11-2026) y Modo Fisio (19-11-2026). Las kcal son aproximadas.</span><span class="day">Meta del día: ≈ 1.300 kcal · ≥ 100 g proteína · 6–8 vasos de agua</span></div>
+</section>
+
+<!-- ============ ALMUERZO ============ -->
+<section class="page almuerzo">
+  <div class="blob" style="width:360px;height:360px;background:#ff7043;right:-140px;top:280px"></div>
+  <div class="blob" style="width:260px;height:260px;background:#ffa726;left:-100px;bottom:-50px"></div>
+  <div class="hero">
+    <div class="big emo">🍗</div>
+    <div><h1>Almuerzo</h1><div class="sub">Tu comida principal. Medio plato de verduras, siempre.</div></div>
+    <div class="chips"><span class="chip">⏰ <b>1:00 p.m.</b></span><span class="chip">🔥 Meta <b>≈ 350 kcal</b></span><span class="chip">💪 Proteína <b>≥ 28 g</b></span></div>
+  </div>
+  <div class="formula"><span class="t">Tu fórmula</span>
+    <span class="pill"><span class="n">1</span> Carne (100–125 g)</span><span class="plus">+</span>
+    <span class="pill"><span class="n">1</span> Harina</span><span class="plus">+</span>
+    <span class="pill"><span class="n">2</span> Verduras (½ plato)</span><span class="plus">+</span>
+    <span class="pill"><span class="n">1</span> Grasa</span><span class="plus">+</span>
+    <span class="pill">Bebida sin azúcar (30 min después)</span>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h2><span class="emo">🥩</span>Elige tus porciones</h2>
+      <div class="grp"><h3>🍗 Carne · ≈ 150–180 kcal · 25–30 g</h3><ul>
+        <li><b>Pollo, res o cerdo magro</b> 100–125 g (1 libra ÷ 4–5)</li><li><b>Pescado</b> ½ mojarra/tilapia mediana</li><li><b>Salmón/trucha</b> 1 trozo mediano</li><li><b>Atún en agua</b> 1 lata</li><li><b>Sardinas</b> 2 medianas</li><li><b>Camarón/langostino</b> 6 medianos</li></ul></div>
+      <div class="grp"><h3>🫘 En vez de carne (vegetal)</h3><ul>
+        <li><b>Fríjol, lenteja, garbanzo, arveja</b> 1 cucharón colmado</li><li><b>Carve seco</b> 5 cdas</li><li>En sopa <b>sin papa ni plátano</b></li><li>Poca proteína: 1–2 veces/semana</li></ul></div>
+      <div class="grp"><h3>🍚 Harina · ≈ 80 kcal</h3><ul>
+        <li><b>Arroz integral/blanco</b> 4 cdas</li><li><b>Papa común</b> 1 mediana</li><li><b>Papa criolla</b> 3</li><li><b>Yuca</b> 1 trozo</li><li><b>Plátano verde</b> ¼</li><li><b>Plátano maduro</b> ¼</li><li><b>Pasta</b> ½ pocillo</li><li><b>Mazamorra/maicitos</b> 5 cdas</li><li><b>Arracacha/ñame</b> 1 trozo pequeño</li><li><b>Sopa/crema</b> 1 cucharón de sólido</li></ul></div>
+      <div class="grp"><h3>🥑 Grasa · ≈ 45 kcal</h3><ul>
+        <li><b>Aguacate</b> ¼</li><li><b>Aceite de oliva</b> 1 cda</li><li><b>Chía/linaza/ajonjolí</b> 3 cdas</li><li><b>Aceitunas</b> 12</li></ul></div>
+      <div class="grp"><h3>🥗 Verduras · libres y abundantes</h3><ul class="one">
+        <li>Lechuga, tomate, pepino, repollo, zanahoria, habichuela, brócoli, coliflor, ahuyama, espinaca, acelga, champiñones, pimentón, rábano, remolacha. <b>1 porción = 1 pocillo chocolatero</b>. Prefiérelas crudas, con limón en vez de aderezo.</li></ul></div>
+    </div>
+    <div class="box">
+      <h2><span class="emo">📋</span>Platos listos para preparar</h2>
+      <div class="menus">
+        <div class="menu"><div class="ic emo">🍗</div><div><h4>Pechuga a la plancha clásica</h4><p>125 g de pechuga + 4 cdas de arroz integral + ensalada grande de lechuga, tomate y pepino con limón + ¼ de aguacate.</p></div><div class="kc"><b>360</b>kcal · 32 g</div></div>
+        <div class="menu"><div class="ic emo">🥘</div><div><h4>Sudado de pollo con yuca</h4><p>Pierna pernil sin piel sudada en hogao + 1 trozo de yuca + habichuela y zanahoria al vapor + 1 cda de aceite de oliva.</p></div><div class="kc"><b>380</b>kcal · 28 g</div></div>
+        <div class="menu"><div class="ic emo">🐟</div><div><h4>Mojarra al horno con patacón</h4><p>½ mojarra al horno con ajo y limón + ¼ de plátano verde en patacón de airfryer + ensalada de repollo y zanahoria + ¼ de aguacate.</p></div><div class="kc"><b>340</b>kcal · 28 g</div></div>
+        <div class="menu"><div class="ic emo">🥩</div><div><h4>Bistec encebollado con papa</h4><p>125 g de carne de res magra en bistec (cebolla y tomate) + 1 papa mediana cocida + brócoli y coliflor + ¼ de aguacate.</p></div><div class="kc"><b>370</b>kcal · 30 g</div></div>
+        <div class="menu"><div class="ic emo">🫘</div><div><h4>Frijolada sin trampa</h4><p>1 cucharón de fríjoles (sin papa, plátano ni garra) + 4 cdas de arroz + ensalada de tomate y cebolla + ¼ de aguacate. Máximo 1–2 veces por semana.</p></div><div class="kc"><b>330</b>kcal · 12 g</div></div>
+        <div class="menu new"><div class="ic emo">🥗</div><div><h4><span class="tag">ALGO DIFERENTE</span>Bowl de atún y criollas</h4><p>1 lata de atún en agua + 3 papas criollas al horno + pepino, tomate, cebolla morada y cilantro + ¼ de aguacate + limón.</p></div><div class="kc"><b>340</b>kcal · 30 g</div></div>
+        <div class="menu new"><div class="ic emo">🍔</div><div><h4><span class="tag">ALGO DIFERENTE</span>Hamburguesa casera sin pan</h4><p>Carne molida magra (125 g) con cebolla y ajo + 3 papas criollas en airfryer + "pan" de hojas de lechuga, tomate, pepinillo + ¼ de aguacate.</p></div><div class="kc"><b>370</b>kcal · 29 g</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="tips">
+    <div class="tip"><span class="emo">🍽️</span><span><b>Orden en el plato:</b> 1º proteína, 2º verduras, 3º harina. Para al primer signo de llenura.</span></div>
+    <div class="tip"><span class="emo">🔥</span><span><b>Sin fritos:</b> plancha, horno, sudado, vapor o airfryer con aceite en spray.</span></div>
+    <div class="tip"><span class="emo">🏪</span><span><b>Si almuerzas fuera:</b> pide carne asada + arroz o papa cocida + ensalada. Deja la sopa con papa y el chicharrón.</span></div>
+  </div>
+  <div class="foot"><span>Integración de los planes CEMDE (13-11-2026) y Modo Fisio (19-11-2026). Las kcal son aproximadas.</span><span class="day">Meta del día: ≈ 1.300 kcal · ≥ 100 g proteína · 6–8 vasos de agua</span></div>
+</section>
+
+<!-- ============ MEDIA TARDE ============ -->
+<section class="page mt">
+  <div class="blob" style="width:360px;height:360px;background:#f06292;right:-140px;top:290px"></div>
+  <div class="blob" style="width:240px;height:240px;background:#ff8a80;left:-90px;bottom:-40px"></div>
+  <div class="hero">
+    <div class="big emo">🍓</div>
+    <div><h1>Media tarde</h1><div class="sub">La hora de los antojos. Tenla planeada y no te sorprende el hambre.</div></div>
+    <div class="chips"><span class="chip">⏰ <b>4:00 p.m.</b></span><span class="chip">🔥 Meta <b>≈ 160 kcal</b></span><span class="chip">💪 Proteína <b>≥ 10 g</b></span></div>
+  </div>
+  <div class="formula"><span class="t">Tu fórmula</span>
+    <span class="pill"><span class="n">1</span> Fruta entera</span><span class="plus">+</span>
+    <span class="pill"><span class="n">1</span> Lácteo o proteína</span>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h2><span class="emo">🥛</span>Elige tus porciones</h2>
+      <div class="grp"><h3>🥛 Lácteo · ≈ 100 kcal · 8–12 g (sin azúcar)</h3><ul>
+        <li><b>Yogur griego natural</b> 1 vaso pequeño</li><li><b>Kumis/kéfir sin azúcar</b> 1 vaso pequeño</li><li><b>Queso pera</b> 1 pequeño</li><li><b>Quesito</b> 1 tajada</li><li><b>Bebida de almendras</b> sin azúcar, 1 vaso</li><li><b>Huevo cocido</b> 1</li></ul></div>
+      <div class="grp"><h3>🍎 Fruta · ≈ 60 kcal (sin madurar de más)</h3><ul>
+        <li><b>Fresas</b> 9</li><li><b>Moras</b> 12</li><li><b>Manzana</b> 1 pequeña</li><li><b>Pera</b> ½</li><li><b>Kiwi</b> 1</li><li><b>Guayaba</b> 1</li><li><b>Papaya</b> 1 tajada</li><li><b>Banano</b> ½ pequeño</li><li><b>Mandarina</b> 1</li><li><b>Uchuvas</b> 17</li></ul></div>
+      <div class="grp"><h3>🍫 Si el antojo es de dulce</h3><ul class="one">
+        <li><b>Gelatina sin azúcar</b> 1 taza grande (casi libre)</li><li><b>Chocolate amargo</b> 2 cuadritos, en vez de la fruta, ocasional</li><li><b>Arequipe/mermelada sin azúcar</b> 1 cda rasa, ocasional</li></ul></div>
+      <div class="grp"><h3>🚫 Evita</h3><ul class="one">
+        <li>Yogures de dulce, avena en botella, galletas de paquete, pan de panadería, tinto con azúcar</li></ul></div>
+    </div>
+    <div class="box">
+      <h2><span class="emo">📋</span>Combinaciones listas</h2>
+      <div class="menus">
+        <div class="menu"><div class="ic emo">🍓</div><div><h4>Griego con fresas y canela</h4><p>1 vaso pequeño de yogur griego natural + 9 fresas picadas + canela y gotas de stevia.</p></div><div class="kc"><b>160</b>kcal · 12 g</div></div>
+        <div class="menu"><div class="ic emo">🍏</div><div><h4>Queso pera + manzana verde</h4><p>1 queso pera + 1 manzana verde pequeña en tajadas.</p></div><div class="kc"><b>150</b>kcal · 8 g</div></div>
+        <div class="menu"><div class="ic emo">🫐</div><div><h4>Kumis con moras</h4><p>1 vaso pequeño de kumis sin azúcar + 12 moras enteras.</p></div><div class="kc"><b>160</b>kcal · 8 g</div></div>
+        <div class="menu"><div class="ic emo">🥝</div><div><h4>Kiwi + quesito</h4><p>1 kiwi + 1 tajada de quesito + 1 taza de gelatina sin azúcar.</p></div><div class="kc"><b>145</b>kcal · 8 g</div></div>
+        <div class="menu"><div class="ic emo">🍈</div><div><h4>Papaya con griego</h4><p>1 tajada de papaya picada con limón + 3 cdas de yogur griego por encima.</p></div><div class="kc"><b>130</b>kcal · 7 g</div></div>
+        <div class="menu new"><div class="ic emo">🍨</div><div><h4><span class="tag">ALGO DIFERENTE</span>"Helado" de banano</h4><p>½ banano pequeño congelado, licuado con 1 vaso pequeño de yogur griego y canela. Textura de helado, sin azúcar.</p></div><div class="kc"><b>160</b>kcal · 12 g</div></div>
+        <div class="menu new"><div class="ic emo">🍮</div><div><h4><span class="tag">ALGO DIFERENTE</span>Copa de gelatina y kéfir</h4><p>1 taza de gelatina sin azúcar en cubos + 1 vaso pequeño de kéfir + 17 uchuvas partidas. Para el antojo de postre.</p></div><div class="kc"><b>150</b>kcal · 8 g</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="tips">
+    <div class="tip"><span class="emo">🧠</span><span><b>¿Hambre o ansiedad?</b> Toma agua, espera 10 minutos. Si sigue, come tu media tarde.</span></div>
+    <div class="tip"><span class="emo">🥕</span><span><b>Comodín:</b> si hay hambre real después, verduras crudas libres (pepino, apio, zanahoria).</span></div>
+    <div class="tip"><span class="emo">🏋️</span><span><b>Día de gimnasio:</b> esta es tu comida previa. No entrenes en ayunas.</span></div>
+  </div>
+  <div class="foot"><span>Integración de los planes CEMDE (13-11-2026) y Modo Fisio (19-11-2026). Las kcal son aproximadas.</span><span class="day">Meta del día: ≈ 1.300 kcal · ≥ 100 g proteína · 6–8 vasos de agua</span></div>
+</section>
+
+<!-- ============ CENA ============ -->
+<section class="page cena">
+  <div class="blob" style="width:360px;height:360px;background:#7e57c2;right:-140px;top:290px"></div>
+  <div class="blob" style="width:240px;height:240px;background:#3f51b5;left:-90px;bottom:-40px"></div>
+  <div class="hero">
+    <div class="big emo">🌙</div>
+    <div><h1>Cena</h1><div class="sub">Liviana, temprana y con proteína. Mínimo 2 horas antes de acostarte.</div></div>
+    <div class="chips"><span class="chip">⏰ <b>7:30 p.m.</b></span><span class="chip">🔥 Meta <b>≈ 280 kcal</b></span><span class="chip">💪 Proteína <b>≥ 25 g</b></span></div>
+  </div>
+  <div class="formula"><span class="t">Tu fórmula</span>
+    <span class="pill"><span class="n">1</span> Carne <b>o</b> 2 proteínas tipo desayuno</span><span class="plus">+</span>
+    <span class="pill"><span class="n">1</span> Harina</span><span class="plus">+</span>
+    <span class="pill"><span class="n">1</span> Verdura</span>
+  </div>
+  <div class="cols">
+    <div class="box">
+      <h2><span class="emo">🐟</span>Elige tus porciones</h2>
+      <div class="grp"><h3>🍗 Opción A, tipo almuerzo · ≈ 150–180 kcal · 25–30 g</h3><ul>
+        <li><b>Pollo o pescado</b> 100–125 g</li><li><b>Res o cerdo magro</b> 100–125 g</li><li><b>Atún en agua</b> 1 lata</li><li><b>Trucha/salmón</b> 1 trozo</li></ul></div>
+      <div class="grp"><h3>🥚 Opción B, tipo desayuno · 2 porciones ≈ 150 kcal · 14 g</h3><ul>
+        <li><b>Huevo</b> 1 = 1 porción</li><li><b>Quesito</b> 1 tajada</li><li><b>Jamón pietrán</b> 2 tajadas</li><li><b>Mozzarella light</b> 2 lonchitas</li><li><b>Huevo codorniz</b> 5</li></ul></div>
+      <div class="grp"><h3>🫓 Harina · ≈ 80 kcal</h3><ul>
+        <li><b>Arepa delgada</b> 1</li><li><b>Arroz</b> 4 cdas</li><li><b>Papa común</b> 1 mediana</li><li><b>Papa criolla</b> 3</li><li><b>Tortilla integral</b> 1</li><li><b>Tostadas arroz</b> 3</li><li><b>Pan integral</b> 1 tajada</li><li><b>Crema/sopa</b> 1 cucharón</li></ul></div>
+      <div class="grp"><h3>🥦 Verdura · ≈ 25 kcal</h3><ul class="one">
+        <li>1 pocillo de ensalada, brócoli, espárragos, champiñones o ahuyama. Cocidas si cenas tarde: caen mejor.</li></ul></div>
+      <div class="grp"><h3>🚫 Evita de noche</h3><ul class="one">
+        <li>Pan con chocolate, comida rápida, recalentar el almuerzo doble, comer viendo TV</li></ul></div>
+    </div>
+    <div class="box">
+      <h2><span class="emo">📋</span>Cenas listas para preparar</h2>
+      <div class="menus">
+        <div class="menu"><div class="ic emo">🐟</div><div><h4>Trucha al horno con criollas</h4><p>1 trozo de trucha con limón y eneldo + 3 papas criollas al horno + brócoli al vapor.</p></div><div class="kc"><b>300</b>kcal · 28 g</div></div>
+        <div class="menu"><div class="ic emo">🌯</div><div><h4>Wrap de pollo desmechado</h4><p>100 g de pollo desmechado salteado con cebolla y pimentón + 1 tortilla integral + lechuga y tomate.</p></div><div class="kc"><b>280</b>kcal · 27 g</div></div>
+        <div class="menu"><div class="ic emo">🍘</div><div><h4>Tostadas de atún</h4><p>1 lata de atún en agua con tomate, cebolla y cilantro sobre 3 tostadas de arroz + pepino.</p></div><div class="kc"><b>250</b>kcal · 28 g</div></div>
+        <div class="menu"><div class="ic emo">🍳</div><div><h4>Cena tipo desayuno</h4><p>2 huevos revueltos con tomate + 1 arepa delgada + ensalada de pepino. La opción más rápida.</p></div><div class="kc"><b>255</b>kcal · 14 g</div></div>
+        <div class="menu"><div class="ic emo">🍲</div><div><h4>Crema de ahuyama con pollo</h4><p>1 cucharón de crema de ahuyama (sin crema de leche ni papa) + 100 g de pollo desmechado encima.</p></div><div class="kc"><b>260</b>kcal · 26 g</div></div>
+        <div class="menu new"><div class="ic emo">🍕</div><div><h4><span class="tag">ALGO DIFERENTE</span>Pizza de arepa</h4><p>1 arepa delgada tostada + tomate natural triturado y orégano + champiñones + 2 lonchitas de mozzarella + 2 tajadas de jamón pietrán. Al horno o airfryer 5 min.</p></div><div class="kc"><b>240</b>kcal · 14 g</div></div>
+        <div class="menu new"><div class="ic emo">🍤</div><div><h4><span class="tag">ALGO DIFERENTE</span>Salteado de langostinos</h4><p>6 langostinos + 1 huevo, salteados con habichuela, zanahoria y ajo en 1 cdta de aceite de oliva + 4 cdas de arroz integral.</p></div><div class="kc"><b>270</b>kcal · 20 g</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="tips">
+    <div class="tip"><span class="emo">🛌</span><span><b>Nada de comer después de cenar.</b> Si hay hambre: aromática o gelatina sin azúcar.</span></div>
+    <div class="tip"><span class="emo">🤢</span><span><b>Con náuseas (Wegovy):</b> cena más pequeña, menos grasa, y no te acuestes enseguida.</span></div>
+    <div class="tip"><span class="emo">🧊</span><span><b>Cocina doble proteína</b> en la cena y deja lista la del almuerzo de mañana.</span></div>
+  </div>
+  <div class="foot"><span>Integración de los planes CEMDE (13-11-2026) y Modo Fisio (19-11-2026). Las kcal son aproximadas.</span><span class="day">Meta del día: ≈ 1.300 kcal · ≥ 100 g proteína · 6–8 vasos de agua</span></div>
+</section>
+
+<!-- ============ NEVERA ============ -->
+<section class="page nevera">
+  <div class="blob" style="width:380px;height:380px;background:#26c6da;right:-150px;top:240px"></div>
+  <div class="blob" style="width:260px;height:260px;background:#ffd54f;left:-100px;bottom:-60px"></div>
+  <div class="hero">
+    <div class="big emo">🧊</div>
+    <div><h1>Reglas de la nevera</h1><div class="sub">Antes de abrir la puerta, lee una. Antes de cerrar, cumple otra.</div></div>
+    <div class="chips"><span class="chip">🗓️ Horarios <b>6:30 · 10 · 1 · 4 · 7:30</b></span></div>
+  </div>
+  <div class="meta">
+    <div><b>≈ 1.300</b>kcal al día</div>
+    <div><b>≥ 100 g</b>proteína al día</div>
+    <div><b>6–8</b>vasos de agua</div>
+    <div><b>5</b>comidas, ninguna omitida</div>
+  </div>
+  <div class="plate">
+    <svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#f3f3f3" stroke="#ddd" stroke-width="3"/><path d="M60 60 L60 8 A52 52 0 0 1 60 112 Z" fill="#43a047"/><path d="M60 60 L60 112 A52 52 0 0 1 8 60 Z" fill="#e53935"/><path d="M60 60 L8 60 A52 52 0 0 1 60 8 Z" fill="#ffb300"/><circle cx="60" cy="60" r="56" fill="none" stroke="#fff" stroke-width="2"/></svg>
+    <div style="font-size:11.5px;line-height:1.55">
+      <div style="font-family:Fraunces,serif;font-weight:900;font-size:20px;color:#00838f;margin-bottom:2px">El plato que funciona</div>
+      <div><span style="color:#43a047;font-weight:800">■ ½ plato: verduras</span>: crudas, con limón, casi sin límite.</div>
+      <div><span style="color:#e53935;font-weight:800">■ ¼ plato: proteína</span>: pollo, pescado, res magra, huevo, atún.</div>
+      <div><span style="color:#ffb300;font-weight:800">■ ¼ plato: harina</span>: arroz, papa, yuca, arepa, plátano. Solo 1 porción.</div>
+    </div>
+  </div>
+  <div class="rules">
+    <div class="rule" style="--rc:#e53935"><div class="emo">🥇</div><div><h4>Proteína primero</h4><p>Los primeros bocados siempre son de proteína. Si con el Wegovy no te cabe todo, lo que sobra es la harina.</p></div></div>
+    <div class="rule" style="--rc:#1e88e5"><div class="emo">💧</div><div><h4>Agua aparte de la comida</h4><p>6–8 vasos en sorbos durante el día. No bebas desde 30 min antes hasta 30 min después de comer (manga).</p></div></div>
+    <div class="rule" style="--rc:#8e24aa"><div class="emo">🐢</div><div><h4>Despacio y con cuchara pequeña</h4><p>Cada comida en 20–30 min. Mastica bien. Para al primer signo de llenura, no cuando ya no puedas más.</p></div></div>
+    <div class="rule" style="--rc:#f4511e"><div class="emo">🚫</div><div><h4>Cero azúcar líquida</h4><p>Ni gaseosa, ni malta, ni Mr. Tea, ni jugos, ni panela, ni miel. Endulza solo con stevia líquida.</p></div></div>
+    <div class="rule" style="--rc:#fb8c00"><div class="emo">🔥</div><div><h4>Nada frito</h4><p>Plancha, horno, vapor, sudado o airfryer con aceite en spray. Sin mantequilla, margarina, crema de leche ni queso crema.</p></div></div>
+    <div class="rule" style="--rc:#43a047"><div class="emo">🧄</div><div><h4>Sazón natural</h4><p>Ajo, cebolla, tomate, cilantro, limón, comino. Evita los cubitos y los condimentos en polvo procesados.</p></div></div>
+    <div class="rule" style="--rc:#00897b"><div class="emo">💊</div><div><h4>Vitaminas todos los días</h4><p>Con manga gástrica es de por vida: multivitamínico, B12, hierro, calcio y vitamina D, según lo que te formule tu médico.</p></div></div>
+    <div class="rule" style="--rc:#5e35b1"><div class="emo">💉</div><div><h4>Wegovy: mi día es ______</h4><p>Mismo día cada semana. Si hay náuseas: porciones más pequeñas, menos grasa y no te acuestes después de comer.</p></div></div>
+    <div class="rule" style="--rc:#3949ab"><div class="emo">🏋️</div><div><h4>Fuerza para no perder músculo</h4><p>Pesas 2–3 veces por semana + caminar los demás días. Bajar grasa sí; perder músculo no.</p></div></div>
+    <div class="rule" style="--rc:#6d4c41"><div class="emo">⚖️</div><div><h4>Me peso una vez por semana</h4><p>Mismo día, en ayunas, después de ir al baño. Anota peso y cintura. Un número no es un juicio, es un dato.</p></div></div>
+    <div class="rule" style="--rc:#c2185b"><div class="emo">🧠</div><div><h4>¿Hambre o antojo?</h4><p>Toma un vaso de agua y espera 10 minutos. Si es hambre real, verduras crudas libres o la comida que sigue.</p></div></div>
+    <div class="rule" style="--rc:#455a64"><div class="emo">🏪</div><div><h4>Fuera de casa</h4><p>Proteína asada + harina no frita + ensalada. Sin comidas rápidas. La bandeja paisa se pide sin chicharrón, morcilla ni arepa extra.</p></div></div>
+  </div>
+  <div class="alarm"><span class="emo">🚨</span><span><b>Consulta al médico de inmediato si:</b> vomitas varias veces seguidas, no toleras ni el agua, tienes dolor abdominal fuerte que se va hacia la espalda, o te sientes muy débil o mareado.</span></div>
+  <div class="foot"><span>Integra los planes CEMDE (13-11-2026) y Modo Fisio (19-11-2026). No reemplaza la indicación de tu equipo de salud.</span><span class="day">Plan de 5 comidas · Medellín</span></div>
+</section>
+
+</body>
+</html>
