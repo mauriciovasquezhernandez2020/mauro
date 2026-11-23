@@ -282,7 +282,7 @@ function ring(val,goal,color,label,unit){const pct=Math.max(0,Math.min(1,goal?va
  return `<div class="ring"><svg viewBox="0 0 78 78" aria-hidden="true"><circle cx="39" cy="39" r="32" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="39" cy="39" r="32" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}" transform="rotate(-90 39 39)"/></svg><div class="v num">${Math.round(val)}<span class="sub"> / ${goal}${unit}</span></div><div class="l">${label}</div></div>`}
 
 /* ======================= ESTADO ======================= */
-const S={db:null,ready:false,days:{},weights:[],events:[],labs:[],settings:{wegovyDay:4,wegovyDose:0.25,gymDays:[1,3,5],times:Object.fromEntries(MEALS.map(m=>[m.id,m.time]))},planTab:null};
+const S={db:null,ready:false,days:{},weights:[],events:[],labs:[],contacts:[],routine:'A',settings:{wegovyDay:4,wegovyDose:0.25,gymDays:[1,3,5],times:Object.fromEntries(MEALS.map(m=>[m.id,m.time]))},planTab:null};
 const emptyDay=d=>({date:d,meals:{},water:0,vitamins:false,hunger:0,exercise:[],note:''});
 const day=d=>S.days[d]||emptyDay(d);
 const mealTime=m=>(S.settings.times&&S.settings.times[m.id])||m.time;
@@ -381,9 +381,38 @@ function vPeso(){
 }
 
 const KINDS={cita:['Cita médica','sky'],examen:['Examen','warn'],wegovy:['Wegovy','acc'],otro:['Otro','']};
+const ROUTINES=[
+ {id:'A',name:'Rutina A · Fuerza cuerpo completo',min:35,kind:'fuerza',type:'Fuerza en casa (A)',
+  gear:'2 mancuernas de 5 kg, banco, colchoneta',
+  steps:[['Calentamiento','5 min: marcha en el sitio moviendo los brazos + círculos de hombros y cadera'],
+   ['Sentarse y pararse del banco','3 × 10–12. Pies al ancho de cadera, bajar despacio hasta tocar el banco, subir empujando con los talones. Con una mancuerna al pecho cuando sea fácil'],
+   ['Press de pecho en banco','3 × 10–12 con las dos mancuernas. Bajar en 2 segundos, subir en 1'],
+   ['Remo a una mano apoyado en el banco','3 × 10–12 por lado. Espalda recta, codo pegado al cuerpo'],
+   ['Peso muerto rumano','3 × 10. Rodillas un poco dobladas, cadera atrás, mancuernas cerca de las piernas, espalda recta'],
+   ['Press de hombro sentado','2 × 10. Sentado en el banco con la espalda apoyada si se puede'],
+   ['Plancha con rodillas apoyadas','3 × 20–30 s en la colchoneta. Cuerpo en línea, sin hundir la cadera']],
+  rest:'Descanso 60–90 s entre series'},
+ {id:'B',name:'Rutina B · Fuerza + abdomen',min:35,kind:'fuerza',type:'Fuerza en casa (B)',
+  gear:'2 mancuernas de 5 kg, banco, colchoneta',
+  steps:[['Calentamiento','5 min: marcha en el sitio + paso lateral (step-touch)'],
+   ['Flexiones inclinadas con manos en el banco','3 × 8–12. Cuanto más alto el apoyo, más fácil'],
+   ['Puente de glúteo','3 × 12–15 en la colchoneta, una mancuerna sobre la cadera'],
+   ['Zancada estática con apoyo','3 × 8 por pierna, una mano en la pared o el banco. Sin peso al principio'],
+   ['Curl de bíceps + extensión de tríceps','2 × 12 de cada uno'],
+   ['Bicho muerto (dead bug)','3 × 8 por lado. Espalda baja pegada a la colchoneta'],
+   ['Caminata de granjero','3 × 30–40 s caminando con una mancuerna en cada mano, hombros atrás'],
+   ['Abdomen en banco (opcional)','2 × 10 encogimientos cortos, solo despegar los hombros. Si duele la espalda o el cuello, hazlos en la colchoneta']],
+  rest:'Descanso 60–90 s entre series'},
+ {id:'C',name:'Rutina C · Cardio suave en casa',min:25,kind:'cardio',type:'Cardio en casa (C)',
+  gear:'Colchoneta y banco',
+  steps:[['Calentamiento','3 min de marcha suave'],
+   ['Circuito × 4 rondas','40 s de trabajo y 20 s de descanso en cada ejercicio: marcha alta en el sitio · paso lateral con brazos · boxeo al aire · sentarse y pararse del banco a ritmo · elevación de talones'],
+   ['Vuelta a la calma','3 min caminando despacio + estiramiento de piernas y espalda en la colchoneta']],
+  rest:'Debes poder hablar en frases cortas. Si no puedes hablar, baja el ritmo'},
+];
 function vAgenda(){
  const t=today();const up=S.events.filter(e=>!e.done).sort((a,b)=>((a.date||'9999')+(a.time||'')).localeCompare((b.date||'9999')+(b.time||'')));const done=S.events.filter(e=>e.done).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,15);
- const item=e=>{const k=KINDS[e.kind]||KINDS.otro;const late=e.date&&e.date<t&&!e.done;return `<div class="li"><div><div class="row" style="gap:6px"><span class="pill ${k[1]}">${k[0]}</span>${late?'<span class="pill bad">Vencido</span>':''}${!e.date?'<span class="pill warn">Sin fecha</span>':''}</div><div class="ttl">${esc(e.title)}</div><div class="meta">${e.date?fmtDate(e.date):'Pídelo y agenda la fecha'}${e.time?' · '+esc(e.time):''}${e.place?' · '+esc(e.place):''}${e.notes?' · '+esc(e.notes):''}</div></div><div class="row" style="gap:6px;justify-content:flex-end">${e.date?`<button class="btn sm" data-ics="${e.id}">Al calendario</button>`:''}<button class="btn sm ${e.done?'':'leaf'}" data-done="${e.id}">${e.done?'Reabrir':'Hecho'}</button><button class="btn sm ghost" data-edit="${e.id}">Editar</button></div></div>`};
+ const item=e=>{const k=KINDS[e.kind]||KINDS.otro;const late=e.date&&e.date<t&&!e.done;return `<div class="li"><div><div class="row" style="gap:6px"><span class="pill ${k[1]}">${k[0]}</span>${late?'<span class="pill bad">Vencido</span>':''}${!e.done&&e.date===t?'<span class="pill acc">Hoy</span>':''}${!e.done&&e.date===addDays(t,1)?'<span class="pill acc">Mañana</span>':''}${!e.date?'<span class="pill warn">Sin fecha</span>':''}</div><div class="ttl">${esc(e.title)}</div><div class="meta">${e.date?fmtDate(e.date):'Pídelo y agenda la fecha'}${e.time?' · '+esc(e.time):''}${e.place?' · '+esc(e.place):''}${e.notes?' · '+esc(e.notes):''}</div></div><div class="row" style="gap:6px;justify-content:flex-end">${e.date?`<button class="btn sm" data-ics="${e.id}">Al calendario</button>`:''}<button class="btn sm ${e.done?'':'leaf'}" data-done="${e.id}">${e.done?'Reabrir':'Hecho'}</button><button class="btn sm ghost" data-edit="${e.id}">Editar</button></div></div>`};
  const lab=S.labs.sort((a,b)=>b.date.localeCompare(a.date))[0];
  return `<section class="card"><div class="row"><h2>Agenda de salud</h2><button class="btn primary" style="margin-left:auto" data-new="1">Nueva cita o examen</button></div>
  <div class="sub">Citas médicas, exámenes pendientes y dosis de Wegovy. "Al calendario" crea un evento con alarma en tu celular o PC.</div>
@@ -392,6 +421,7 @@ function vAgenda(){
  <div class="sub">La dosis sube cada 4 semanas según tu médico (0,25 → 0,5 → 1 → 1,7 → 2,4 mg). Anota cada aplicación.</div>
  <div class="row"><button class="btn leaf" data-dose="1">Anotar aplicación de hoy</button><button class="btn" data-wset="1">Cambiar dosis o día</button></div></section>
  ${lab?`<section class="card"><div class="row"><h3>Últimos exámenes</h3><span class="pill">${fmtDate(lab.date)}</span></div><div class="tbl"><table class="lab"><thead><tr><th>Examen</th><th>Resultado</th><th>Rango</th><th></th></tr></thead><tbody>${(lab.items||[]).map(i=>`<tr><td>${esc(i.n)}</td><td class="num"><b>${esc(i.v)}</b> ${esc(i.u||'')}</td><td class="num sub">${esc(i.ref||'')}</td><td>${i.flag==='alto'?'<span class="pill bad">Alto</span>':i.flag==='bajo'?'<span class="pill bad">Bajo</span>':i.flag==='limite'?'<span class="pill warn">Límite</span>':'<span class="pill ok">Normal</span>'}</td></tr>`).join('')}</tbody></table></div>${lab.note?`<div class="note">${esc(lab.note)}</div>`:''}</section>`:''}
+ ${S.contacts.length?`<section class="card"><h3>Contactos de salud</h3><div class="list">${S.contacts.map(c=>`<div class="li"><div><div class="ttl">${esc(c.name)}</div><div class="meta" style="user-select:all">${esc(c.detail)}</div></div></div>`).join('')}</div></section>`:''}
  ${done.length?`<section class="card"><h3>Hecho</h3><div class="list">${done.map(item).join('')}</div></section>`:''}`;
 }
 
@@ -403,6 +433,10 @@ function vEjercicio(){
  <form class="form" id="exForm"><label class="f">Tipo<select id="exKind"><option value="fuerza">Fuerza / pesas</option><option value="cardio">Cardio (bici, elíptica)</option><option value="caminata">Caminata</option><option value="otro">Otro</option></select></label><label class="f">Minutos<input type="number" id="exMin" min="5" max="300" value="45" required></label><label class="f">Fecha<input type="date" id="exDate" value="${t}"></label><button class="btn primary">Registrar</button></form></section>
  <section class="grid3">${ring(str,3,'var(--accent)','Sesiones de fuerza (7 días)','')}${ring(minT,150,'var(--leaf)','Minutos activos (7 días)','')}${ring(rows.filter(r=>r[1].length).length,5,'var(--sky)','Días activos','')}</section>
  <section class="card"><h3>Últimos 7 días</h3><div class="list">${rows.reverse().map(([ds,ex])=>`<div class="li"><div><div class="ttl">${fmtDate(ds)}${gym.includes(new Date(ds+'T12:00:00').getDay())?' <span class="pill sky">Día de gym</span>':''}</div><div class="meta">${ex.length?esc(ex.map(e=>`${e.type} ${e.min} min`).join(' · ')):'Descanso'}</div></div>${ex.length?`<button class="btn sm ghost" data-clrex="${ds}">Borrar</button>`:''}</div>`).join('')}</div></section>
+ <section class="card"><h2>Rutinas en casa</h2><div class="sub">Con tus 2 mancuernas de 5 kg, el banco y la colchoneta. Plan sugerido: tus días de gimnasio + 1 día de Rutina A o B en casa + Rutina C o caminata los demás días. Muéstrale estas rutinas a tu deportóloga para que las ajuste.</div>
+ <div class="mealtabs">${ROUTINES.map(r=>`<button class="${(S.routine||'A')===r.id?'on':''}" data-rtab="${r.id}">${esc(r.name.split(' · ')[0])}</button>`).join('')}</div>
+ ${(()=>{const r=ROUTINES.find(x=>x.id===(S.routine||'A'));return `<div class="row"><h3>${esc(r.name)}</h3><span class="pill">≈ ${r.min} min</span></div><div class="sub">${esc(r.gear)} · ${esc(r.rest)}</div><div class="list">${r.steps.map((s,i)=>`<div class="li" style="grid-template-columns:28px 1fr"><div class="pill acc num" style="justify-content:center">${i+1}</div><div><div class="ttl">${esc(s[0])}</div><div class="meta">${esc(s[1])}</div></div></div>`).join('')}</div><button class="btn leaf" data-doroutine="${r.id}">Hice esta rutina hoy</button>`})()}
+ <div class="note"><b>Cómo progresar:</b> cuando hagas todas las series con 2 repeticiones de sobra, sube repeticiones (hasta 15) antes de pensar en más peso. <b>Para</b> si sientes dolor en el pecho, mareo, falta de aire fuerte o dolor en una articulación.</div></section>
  <section class="tip"><div class="ic">!</div><div><b>Fuerza primero</b><div>Con Wegovy parte del peso que se baja es músculo. La fuerza 2–3 veces por semana y ≥100 g de proteína al día lo protegen. Come tu media tarde antes de entrenar.</div></div></section>`;
 }
 
@@ -487,6 +521,8 @@ document.addEventListener('click',async e=>{
  if(ds.log){logDialog(ds.log);return}
  if(ds.plan){S.planTab=ds.plan}
  if(ds.ptab){S.planTab=ds.ptab;render();return}
+ if(ds.rtab){S.routine=ds.rtab;render();return}
+ if(ds.doroutine){const r=ROUTINES.find(x=>x.id===ds.doroutine);const d=structuredClone(day(today()));d.exercise=[...(d.exercise||[]),{kind:r.kind,type:r.type,min:r.min}];saveDay(d);toast(r.type+' registrada');return}
  if(ds.quick){const [mid,i]=ds.quick.split('|');const x=MEALS.find(m=>m.id===mid).menus[+i];addItem(mid,{n:x[0],k:x[2],p:x[3]},true);toast(`${x[0]} registrado`);return}
  if(ds.addmenu){const [mid,i]=ds.addmenu.split('|');const x=MEALS.find(m=>m.id===mid).menus[+i];addItem(mid,{n:x[0],k:x[2],p:x[3]});logDialog(mid);return}
  if(ds.addex){const [mid,k]=ds.addex.split('|');const v=EX[k];addItem(mid,{n:v.n,k:v.k,p:v.p});logDialog(mid);return}
@@ -530,6 +566,7 @@ nav();tick();render();
  db.collection('logs').orderBy('date','desc').limit(120).onSnapshot(s=>{S.days={};s.docs.forEach(d=>{S.days[d.id]={...emptyDay(d.id),...d.data()}});if(!s.metadata.fromCache)ok();if(!$('#dlg').open)render()},fail);
  db.collection('weights').onSnapshot(s=>{S.weights=s.docs.map(d=>({date:d.id,...d.data()}));render()},fail);
  db.collection('events').onSnapshot(s=>{S.events=s.docs.map(d=>({id:d.id,...d.data()}));if(!$('#dlg').open)render()},fail);
+ db.collection('contacts').onSnapshot(s=>{S.contacts=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));render()},fail);
  db.collection('labs').onSnapshot(s=>{S.labs=s.docs.map(d=>({date:d.id,...d.data()}));render()},fail);
  db.doc('settings/main').onSnapshot(s=>{if(s.exists)S.settings={...S.settings,...s.data()};render()},fail);
 })();
