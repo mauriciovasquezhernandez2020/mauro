@@ -119,7 +119,7 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:60
 .mealtabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .formula{display:flex;flex-wrap:wrap;gap:6px}
 .formula span{background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:13px;padding:5px 10px;border-radius:8px}
-.menu{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.menu{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:8px 12px;padding:12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
 .menu .k{text-align:right;font-weight:800;color:var(--accent);white-space:nowrap}
 .menu .k small{display:block;font-weight:600;color:var(--muted);font-size:11.5px}
 .menu p{margin:2px 0 0;font-size:13.5px;color:var(--muted)}
@@ -182,6 +182,9 @@ details summary{cursor:pointer;font-weight:600;padding:6px 0}
 @keyframes rise{from{transform:translateY(8px)}to{transform:none}}
 main>section{animation:rise .35s ease both}
 @media (prefers-reduced-motion:reduce){main>section{animation:none}}
+.mimg{width:72px;height:72px;object-fit:cover;border-radius:10px}
+.eimg{width:84px;height:84px;object-fit:cover;border-radius:10px}
+@media (max-width:420px){.menu{grid-template-columns:60px 1fr auto}.mimg{width:60px;height:60px}}
 pre.ics{white-space:pre-wrap;font-size:11px;max-height:180px;overflow:auto;background:var(--surface-2);padding:10px;border-radius:10px}
 </style>
 
@@ -377,7 +380,7 @@ function vPlan(){
  <div class="mealtabs">${MEALS.map(x=>`<button class="${x.id===m.id?'on':''}" data-ptab="${x.id}">${esc(x.name)} · ${esc(mealTime(x))}</button>`).join('')}</div></section>
  <section class="card"><img class="banner" src="img/${m.id}.jpg" alt="${esc(m.name)} de ejemplo"><div class="row"><h2>${esc(m.name)}</h2><span class="pill acc">${esc(mealTime(m))}</span><span class="pill">≈ ${m.kcal} kcal</span><span class="pill ok">≥ ${m.prot} g proteína</span></div>
  <div class="formula">${m.formula.map(f=>`<span>${esc(f)}</span>`).join('')}</div>
- <h3>Menús listos</h3><div class="list" style="gap:8px">${m.menus.map((x,i)=>`<div class="menu ${x[4]?'new':''}"><div><b>${x[4]?'<span class="pill acc">Algo diferente</span> ':''}${esc(x[0])}</b><p>${esc(x[1])}</p></div><div class="k num">${x[2]}<small>kcal · ${x[3]} g</small><button class="btn sm leaf" style="margin-top:6px" data-quick="${m.id}|${i}">Comí esto</button></div></div>`).join('')}</div></section>
+ <h3>Menús listos</h3><div class="list" style="gap:8px">${m.menus.map((x,i)=>`<div class="menu ${x[4]?'new':''}"><img class="mimg" src="img/m/${m.id}-${i}.jpg" alt="${esc(x[0])}" loading="lazy"><div><b>${x[4]?'<span class="pill acc">Algo diferente</span> ':''}${esc(x[0])}</b><p>${esc(x[1])}</p></div><div class="k num">${x[2]}<small>kcal · ${x[3]} g</small><button class="btn sm leaf" style="margin-top:6px" data-quick="${m.id}|${i}">Comí esto</button></div></div>`).join('')}</div></section>
  <section class="card"><h3>Porciones para armar tu plato</h3>${m.groups.map(g=>`<div class="grp"><h4>${esc(g[0])}</h4><ul>${g[1].map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}
  ${m.tips.map(t=>`<div class="tip"><div class="ic">!</div><div>${esc(t)}</div></div>`).join('')}</section>`;
 }
@@ -411,6 +414,7 @@ function vPeso(){
 }
 
 const KINDS={cita:['Cita médica','sky'],examen:['Examen','warn'],wegovy:['Wegovy','acc'],otro:['Otro','']};
+const EXIMG=new Set(['A-0','A-1','A-2','A-3','A-4','A-5','B-0','B-1','B-2','B-3','B-4','B-5','B-6','B-7','C-0','C-1']);
 const ROUTINES=[
  {id:'A',name:'Rutina A · Fuerza cuerpo completo',min:35,kind:'fuerza',type:'Fuerza en casa (A)',
   gear:'2 mancuernas de 5 kg, banco, colchoneta',
@@ -467,7 +471,7 @@ function vEjercicio(){
  <section class="card"><h3>Últimos 7 días</h3><div class="list">${rows.reverse().map(([ds,ex])=>`<div class="li"><div><div class="ttl">${fmtDate(ds)}${gym.includes(new Date(ds+'T12:00:00').getDay())?' <span class="pill sky">Día de gym</span>':''}</div><div class="meta">${ex.length?esc(ex.map(e=>`${e.type} ${e.min} min`).join(' · ')):'Descanso'}</div></div>${ex.length?`<button class="btn sm ghost" data-clrex="${ds}">Borrar</button>`:''}</div>`).join('')}</div></section>
  <section class="card"><h2>Rutinas en casa</h2><div class="sub">Con tus 2 mancuernas de 5 kg, el banco y la colchoneta. Plan sugerido: tus días de gimnasio + 1 día de Rutina A o B en casa + Rutina C o caminata los demás días. Muéstrale estas rutinas a tu deportóloga para que las ajuste.</div>
  <div class="mealtabs">${ROUTINES.map(r=>`<button class="${(S.routine||'A')===r.id?'on':''}" data-rtab="${r.id}">${esc(r.name.split(' · ')[0])}</button>`).join('')}</div>
- ${(()=>{const r=ROUTINES.find(x=>x.id===(S.routine||'A'));return `<div class="row"><h3>${esc(r.name)}</h3><span class="pill">≈ ${r.min} min</span></div><div class="sub">${esc(r.gear)} · ${esc(r.rest)}</div><div class="list">${r.steps.map((s,i)=>`<div class="li" style="grid-template-columns:28px 1fr"><div class="pill acc num" style="justify-content:center">${i+1}</div><div><div class="ttl">${esc(s[0])}</div><div class="meta">${esc(s[1])}</div></div></div>`).join('')}</div><button class="btn leaf" data-doroutine="${r.id}">Hice esta rutina hoy</button>`})()}
+ ${(()=>{const r=ROUTINES.find(x=>x.id===(S.routine||'A'));return `<div class="row"><h3>${esc(r.name)}</h3><span class="pill">≈ ${r.min} min</span></div><div class="sub">${esc(r.gear)} · ${esc(r.rest)}</div><div class="list">${r.steps.map((s,i)=>`<div class="li" style="grid-template-columns:${EXIMG.has(r.id+'-'+i)?'84px':'28px'} 1fr">${EXIMG.has(r.id+'-'+i)?`<img class="eimg" src="img/e/${r.id}-${i}.jpg" alt="${esc(s[0])}" loading="lazy">`:`<div class="pill acc num" style="justify-content:center">${i+1}</div>`}<div><div class="ttl">${esc(s[0])}</div><div class="meta">${esc(s[1])}</div></div></div>`).join('')}</div><button class="btn leaf" data-doroutine="${r.id}">Hice esta rutina hoy</button>`})()}
  <div class="note"><b>Cómo progresar:</b> cuando hagas todas las series con 2 repeticiones de sobra, sube repeticiones (hasta 15) antes de pensar en más peso. <b>Para</b> si sientes dolor en el pecho, mareo, falta de aire fuerte o dolor en una articulación.</div></section>
  <section class="tip"><div class="ic">!</div><div><b>Fuerza primero</b><div>Con Wegovy parte del peso que se baja es músculo. La fuerza 2–3 veces por semana y ≥100 g de proteína al día lo protegen. Come tu media tarde antes de entrenar.</div></div></section>`;
 }
