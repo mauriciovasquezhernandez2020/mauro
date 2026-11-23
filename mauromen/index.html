@@ -172,7 +172,7 @@ dialog .in{padding:18px;display:flex;flex-direction:column;gap:12px;max-height:8
 .hub button:hover{border-color:var(--accent)}
 details summary{cursor:pointer;font-weight:600;padding:6px 0}
 .hero-art{border-radius:var(--r);overflow:hidden;background:var(--bar);color:var(--bar-ink);position:relative;padding:20px;min-height:120px;display:flex;flex-direction:column;justify-content:flex-end;gap:4px}
-.hero-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;filter:blur(.4px)}
+.hero-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.62}
 .hero-art{min-height:150px}
 .nowgrid{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
 .nowgrid .pic{width:min(150px,34vw);aspect-ratio:16/9;object-fit:cover;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
@@ -346,12 +346,12 @@ function vHoy(){
  if(focus){const fm=focus.m,done=d.meals[fm.id]?.done,dt=focus.t-now;
   const when=dt>0?`en ${Math.floor(dt/60)?Math.floor(dt/60)+' h ':''}${dt%60} min`:'ahora';
   hero=`<section class="card now"><div class="row"><span class="pill acc">${esc(mealTime(fm))}</span>${done?'<span class="pill ok">Registrada</span>':''}<span class="countdown" style="margin-left:auto">${when}</span></div>
-  <div class="nowgrid"><div><div class="big">${esc(fm.name)}</div><div class="sub">Meta ≈ ${fm.kcal} kcal · ≥ ${fm.prot} g proteína · ${fm.formula.join(' + ')}</div></div><img class="pic" src="img/${fm.id}.png" alt="${esc(fm.name)} de ejemplo"></div>
+  <div class="nowgrid"><div><div class="big">${esc(fm.name)}</div><div class="sub">Meta ≈ ${fm.kcal} kcal · ≥ ${fm.prot} g proteína · ${fm.formula.join(' + ')}</div></div><img class="pic" src="img/${fm.id}.jpg" alt="${esc(fm.name)} de ejemplo"></div>
   <div class="row"><button class="btn primary" data-log="${fm.id}">Registrar lo que comí</button><a class="btn ghost" href="#plan" data-plan="${fm.id}">Ver opciones</a></div></section>`}
  else hero=`<section class="card now"><div class="big">Día cerrado</div><div class="sub">La cena ya pasó. Solo aromática o gelatina sin azúcar si hay hambre.</div></section>`;
  const tip=TIPS[(new Date(today()).getTime()/864e5|0)%TIPS.length];
  const meals=MEALS.map(m=>{const md=d.meals[m.id]||{},it=(md.items||[]);const cur=focus&&focus.m.id===m.id;
-  return `<div class="meal ${md.done?'done':''} ${cur?'current':''}"><div class="t num"><img class="thumb" src="img/${m.id}.png" alt="">${esc(mealTime(m))}</div><div><div class="n">${esc(m.name)}</div><div class="items">${it.length?esc(it.map(i=>i.n).join(' · ')):'Sin registrar'}</div></div><button class="btn sm" data-log="${m.id}">${it.length?'Editar':'Anotar'}</button></div>`}).join('');
+  return `<div class="meal ${md.done?'done':''} ${cur?'current':''}"><div class="t num"><img class="thumb" src="img/${m.id}.jpg" alt="">${esc(mealTime(m))}</div><div><div class="n">${esc(m.name)}</div><div class="items">${it.length?esc(it.map(i=>i.n).join(' · ')):'Sin registrar'}</div></div><button class="btn sm" data-log="${m.id}">${it.length?'Editar':'Anotar'}</button></div>`}).join('');
  const ex=d.exercise||[];
  const nextEv=S.events.filter(e=>!e.done&&e.date>=today()).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||'')))[0];
  return `${hero}${vPending()}${vInsights()}
@@ -375,7 +375,7 @@ function vPlan(){
  const cur=S.planTab||(currentMeal().next||{m:MEALS[0]}).m.id;const m=MEALS.find(x=>x.id===cur)||MEALS[0];
  return `<section class="card"><h2>Plan de alimentación</h2><div class="sub">Integra tus planes CEMDE y Modo Fisio. Meta del día ≈ ${GOAL.kcal} kcal · ≥ ${GOAL.prot} g de proteína · ${GOAL.water} vasos de agua.</div>
  <div class="mealtabs">${MEALS.map(x=>`<button class="${x.id===m.id?'on':''}" data-ptab="${x.id}">${esc(x.name)} · ${esc(mealTime(x))}</button>`).join('')}</div></section>
- <section class="card"><img class="banner" src="img/${m.id}.png" alt="${esc(m.name)} de ejemplo"><div class="row"><h2>${esc(m.name)}</h2><span class="pill acc">${esc(mealTime(m))}</span><span class="pill">≈ ${m.kcal} kcal</span><span class="pill ok">≥ ${m.prot} g proteína</span></div>
+ <section class="card"><img class="banner" src="img/${m.id}.jpg" alt="${esc(m.name)} de ejemplo"><div class="row"><h2>${esc(m.name)}</h2><span class="pill acc">${esc(mealTime(m))}</span><span class="pill">≈ ${m.kcal} kcal</span><span class="pill ok">≥ ${m.prot} g proteína</span></div>
  <div class="formula">${m.formula.map(f=>`<span>${esc(f)}</span>`).join('')}</div>
  <h3>Menús listos</h3><div class="list" style="gap:8px">${m.menus.map((x,i)=>`<div class="menu ${x[4]?'new':''}"><div><b>${x[4]?'<span class="pill acc">Algo diferente</span> ':''}${esc(x[0])}</b><p>${esc(x[1])}</p></div><div class="k num">${x[2]}<small>kcal · ${x[3]} g</small><button class="btn sm leaf" style="margin-top:6px" data-quick="${m.id}|${i}">Comí esto</button></div></div>`).join('')}</div></section>
  <section class="card"><h3>Porciones para armar tu plato</h3>${m.groups.map(g=>`<div class="grp"><h4>${esc(g[0])}</h4><ul>${g[1].map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}
@@ -460,7 +460,7 @@ function vEjercicio(){
  const t=today();let str=0,card=0,minT=0;const rows=[];
  for(let i=6;i>=0;i--){const ds=addDays(t,-i);const d=day(ds);const ex=d.exercise||[];ex.forEach(e=>{minT+=+e.min||0;if(e.kind==='fuerza')str++;else card+=+e.min||0});rows.push([ds,ex])}
  const gym=S.settings.gymDays||[];
- return `<section class="hero-art"><img src="img/ejercicio.png" alt=""><h2 style="font-size:26px">Ejercicio</h2><div style="opacity:.85">Tus 2 mancuernas de 5 kg, el banco y la colchoneta.</div></section>
+ return `<section class="hero-art"><img src="img/ejercicio.jpg" alt=""><h2 style="font-size:26px">Ejercicio</h2><div style="opacity:.85">Tus 2 mancuernas de 5 kg, el banco y la colchoneta.</div></section>
  <section class="card"><h2>Registrar</h2><div class="sub">Meta semanal: fuerza 2–3 veces + 150 minutos o más de actividad. Tus días de gimnasio: ${gym.map(g=>DAYS[g]).join(', ')||'sin definir'}.</div>
  <form class="form" id="exForm"><label class="f">Tipo<select id="exKind"><option value="fuerza">Fuerza / pesas</option><option value="cardio">Cardio (bici, elíptica)</option><option value="caminata">Caminata</option><option value="otro">Otro</option></select></label><label class="f">Minutos<input type="number" id="exMin" min="5" max="300" value="45" required></label><label class="f">Fecha<input type="date" id="exDate" value="${t}"></label><button class="btn primary">Registrar</button></form></section>
  <section class="grid3">${ring(str,3,'var(--accent)','Sesiones de fuerza (7 días)','')}${ring(minT,150,'var(--leaf)','Minutos activos (7 días)','')}${ring(rows.filter(r=>r[1].length).length,5,'var(--sky)','Días activos','')}</section>
@@ -474,7 +474,7 @@ function vEjercicio(){
 
 function vMas(){
  const st=S.settings;
- return `<section class="hero-art"><img src="${esc(S.settings.heroUrl||'img/proceso.png')}" alt=""><h2 style="font-size:26px">Mi proceso</h2><div style="opacity:.85">Todo lo que tus médicos necesitan saber, en un solo lugar.</div></section>
+ return `<section class="hero-art"><img src="${esc(S.settings.heroUrl||'img/proceso.jpg')}" alt=""><h2 style="font-size:26px">Mi proceso</h2><div style="opacity:.85">Todo lo que tus médicos necesitan saber, en un solo lugar.</div></section>
  <section class="hub">
   <button data-todo="profile"><b>Perfil clínico</b><span>Cirugía, medicamentos, diagnósticos y médicos</span></button>
   <button data-todo="checkin"><b>Check-in de hoy</b><span>Sueño, energía, ánimo y efectos del Wegovy</span></button>
